@@ -3,122 +3,197 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MediScan AI</title>
+  <title>MediScan AI - Smart Symptom Checker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
-      background: #f0f4f8;
-      color: #333;
+      background: linear-gradient(135deg, #e0f2ff, #ffffff);
+      color: #1a2b3c;
     }
     header {
-      background-color: #0a84ff;
+      background: #0077cc;
       color: white;
-      padding: 1rem 2rem;
+      padding: 2rem 1rem;
       text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
     }
     main {
-      padding: 2rem;
-      max-width: 700px;
+      padding: 2rem 1rem;
+      max-width: 800px;
       margin: auto;
     }
     .card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       padding: 2rem;
       margin-top: 2rem;
+      transition: 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      resize: vertical;
     }
     button {
-      background-color: #0a84ff;
+      background: #0077cc;
       color: white;
       border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
+      padding: 0.9rem 2rem;
+      border-radius: 12px;
       font-size: 1rem;
       cursor: pointer;
       margin-top: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     button:hover {
-      background-color: #006edc;
+      background: #005fa3;
+    }
+    .result-box {
+      background-color: #eef8ff;
+      padding: 1.5rem;
+      border-left: 6px solid #0077cc;
+      border-radius: 10px;
+      margin-top: 1rem;
+      font-size: 1.05rem;
+    }
+    .result-box p {
+      margin: 0.5rem 0;
     }
     .hidden {
       display: none;
     }
-    input, textarea {
-      width: 100%;
-      padding: 0.7rem;
-      margin-top: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
+    .disclaimer {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>MediScan AI</h1>
-    <p>Your AI-powered Symptom Analyzer</p>
+    <h1>🩺 MediScan AI</h1>
+    <p>Your Smart Symptom Checker & Medical Assistant</p>
   </header>
 
   <main>
-    <section class="card" id="welcome-section">
-      <h2>Welcome to MediScan AI</h2>
-      <p>Enter your symptoms and get a smart recommendation of which specialist to consult.</p>
-      <button onclick="startDiagnosis()">Start Diagnosis</button>
-    </section>
-
-    <section class="card hidden" id="input-section">
-      <h2>Enter Your Symptoms</h2>
-      <textarea id="symptomsInput" rows="5" placeholder="e.g. headache, fever, fatigue..."></textarea>
-      <button onclick="analyzeSymptoms()">Diagnose</button>
+    <section class="card">
+      <h2>🔎 Describe Your Symptoms</h2>
+      <textarea id="symptomsInput" rows="5" placeholder="e.g. fever, sore throat, headache..."></textarea>
+      <button onclick="analyzeSymptoms()">Analyze</button>
     </section>
 
     <section class="card hidden" id="result-section">
-      <h2>Diagnosis Result</h2>
-      <p><strong>Possible Condition:</strong> <span id="condition">–</span></p>
-      <p><strong>Recommended Specialist:</strong> <span id="specialist">–</span></p>
-      <button onclick="restart()">Start Over</button>
+      <h2>📋 Results</h2>
+      <div class="result-box">
+        <p><strong>🧠 Probable Condition:</strong> <span id="condition"></span></p>
+        <p><strong>💊 Suggested Medication:</strong> <span id="medication"></span></p>
+        <p><strong>👨‍⚕️ Recommended Specialist:</strong> <span id="specialist"></span></p>
+      </div>
+      <div class="disclaimer">
+        ⚠️ This result is for educational use only. Please consult a certified doctor for real diagnosis and treatment.
+      </div>
     </section>
   </main>
 
   <script>
-    function startDiagnosis() {
-      document.getElementById('welcome-section').classList.add('hidden');
-      document.getElementById('input-section').classList.remove('hidden');
-    }
+    const database = [
+      {
+        symptoms: ['fever', 'cough', 'sore throat', 'body pain'],
+        condition: 'Flu / Viral Infection',
+        medication: 'Paracetamol, Cough Syrup, Rest, Fluids',
+        specialist: 'General Physician'
+      },
+      {
+        symptoms: ['headache', 'nausea', 'sensitivity to light'],
+        condition: 'Migraine',
+        medication: 'Ibuprofen or Sumatriptan',
+        specialist: 'Neurologist'
+      },
+      {
+        symptoms: ['rash', 'itching', 'redness', 'swelling'],
+        condition: 'Allergic Reaction or Dermatitis',
+        medication: 'Antihistamines (Cetirizine), Calamine Lotion',
+        specialist: 'Dermatologist'
+      },
+      {
+        symptoms: ['chest pain', 'shortness of breath', 'fatigue'],
+        condition: 'Possible Cardiac Issue',
+        medication: 'Consult a cardiologist immediately. Avoid self-medication.',
+        specialist: 'Cardiologist'
+      },
+      {
+        symptoms: ['frequent urination', 'thirst', 'blurred vision', 'fatigue'],
+        condition: 'Diabetes Symptoms',
+        medication: 'Blood test required. Consult physician.',
+        specialist: 'Endocrinologist'
+      },
+      {
+        symptoms: ['abdominal pain', 'bloating', 'diarrhea', 'nausea'],
+        condition: 'Gastroenteritis / Food Poisoning',
+        medication: 'ORS, Antacids, Light diet, Domperidone',
+        specialist: 'Gastroenterologist'
+      }
+    ];
 
     function analyzeSymptoms() {
       const input = document.getElementById('symptomsInput').value.toLowerCase();
+      const inputSymptoms = input.split(',').map(s => s.trim());
 
-      let condition = "Unknown";
-      let specialist = "General Physician";
+      let bestMatch = null;
+      let maxMatches = 0;
 
-      if (input.includes("fever") && input.includes("cough")) {
-        condition = "Flu or Viral Infection";
-        specialist = "General Physician";
-      } else if (input.includes("headache") && input.includes("sensitivity")) {
-        condition = "Migraine";
-        specialist = "Neurologist";
-      } else if (input.includes("chest pain") || input.includes("breathless")) {
-        condition = "Cardiac Issue";
-        specialist = "Cardiologist";
-      } else if (input.includes("rash") || input.includes("itching")) {
-        condition = "Allergy or Skin Infection";
-        specialist = "Dermatologist";
+      database.forEach(entry => {
+        const matches = entry.symptoms.filter(symptom => inputSymptoms.includes(symptom)).length;
+        if (matches > maxMatches) {
+          bestMatch = entry;
+          maxMatches = matches;
+        }
+      });
+
+      if (bestMatch && maxMatches > 0) {
+        document.getElementById('condition').textContent = bestMatch.condition;
+        document.getElementById('medication').textContent = bestMatch.medication;
+        document.getElementById('specialist').textContent = bestMatch.specialist;
+      } else {
+        document.getElementById('condition').textContent = 'Not enough data to suggest a condition.';
+        document.getElementById('medication').textContent = 'Please enter more specific symptoms.';
+        document.getElementById('specialist').textContent = 'General Physician';
       }
 
-      document.getElementById('condition').textContent = condition;
-      document.getElementById('specialist').textContent = specialist;
-      document.getElementById('input-section').classList.add('hidden');
       document.getElementById('result-section').classList.remove('hidden');
-    }
-
-    function restart() {
-      document.getElementById('result-section').classList.add('hidden');
-      document.getElementById('welcome-section').classList.remove('hidden');
-      document.getElementById('symptomsInput').value = "";
     }
   </script>
 
