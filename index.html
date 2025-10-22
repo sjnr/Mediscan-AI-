@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediScan AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f0f4f8;
+      color: #333;
+    }
+    header {
+      background-color: #0a84ff;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    button {
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background-color: #006edc;
+    }
+    .hidden {
+      display: none;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-top: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>MediScan AI</h1>
+    <p>Your AI-powered Symptom Analyzer</p>
+  </header>
+
+  <main>
+    <section class="card" id="welcome-section">
+      <h2>Welcome to MediScan AI</h2>
+      <p>Enter your symptoms and get a smart recommendation of which specialist to consult.</p>
+      <button onclick="startDiagnosis()">Start Diagnosis</button>
+    </section>
+
+    <section class="card hidden" id="input-section">
+      <h2>Enter Your Symptoms</h2>
+      <textarea id="symptomsInput" rows="5" placeholder="e.g. headache, fever, fatigue..."></textarea>
+      <button onclick="analyzeSymptoms()">Diagnose</button>
+    </section>
+
+    <section class="card hidden" id="result-section">
+      <h2>Diagnosis Result</h2>
+      <p><strong>Possible Condition:</strong> <span id="condition">–</span></p>
+      <p><strong>Recommended Specialist:</strong> <span id="specialist">–</span></p>
+      <button onclick="restart()">Start Over</button>
+    </section>
+  </main>
+
+  <script>
+    function startDiagnosis() {
+      document.getElementById('welcome-section').classList.add('hidden');
+      document.getElementById('input-section').classList.remove('hidden');
+    }
+
+    function analyzeSymptoms() {
+      const input = document.getElementById('symptomsInput').value.toLowerCase();
+
+      let condition = "Unknown";
+      let specialist = "General Physician";
+
+      if (input.includes("fever") && input.includes("cough")) {
+        condition = "Flu or Viral Infection";
+        specialist = "General Physician";
+      } else if (input.includes("headache") && input.includes("sensitivity")) {
+        condition = "Migraine";
+        specialist = "Neurologist";
+      } else if (input.includes("chest pain") || input.includes("breathless")) {
+        condition = "Cardiac Issue";
+        specialist = "Cardiologist";
+      } else if (input.includes("rash") || input.includes("itching")) {
+        condition = "Allergy or Skin Infection";
+        specialist = "Dermatologist";
+      }
+
+      document.getElementById('condition').textContent = condition;
+      document.getElementById('specialist').textContent = specialist;
+      document.getElementById('input-section').classList.add('hidden');
+      document.getElementById('result-section').classList.remove('hidden');
+    }
+
+    function restart() {
+      document.getElementById('result-section').classList.add('hidden');
+      document.getElementById('welcome-section').classList.remove('hidden');
+      document.getElementById('symptomsInput').value = "";
+    }
+  </script>
+
+</body>
+</html>
